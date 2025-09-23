@@ -1,8 +1,8 @@
-🎉 <h2>Fun iOS Swift Template</h2>
+ <h2>🎉 Fun iOS Swift Template</h2>
 
 Fun iOS Swift Template is a starter template for building iOS apps with a clean, organized, and fun structure. It’s perfect for anyone learning Swift, experimenting with features, or building apps quickly without reinventing the wheel.
 
-🚀 <h3>Features</h3>
+<h3>🚀 Features</h3>
 
 Three essential tabs:
 
@@ -15,7 +15,7 @@ Three essential tabs:
  - [x] Lightweight and clean – Focus on your ideas, not boilerplate.
  - [x] Beginner-friendly – Perfect for learning and experimenting.
 
-📚 <h3>Learning Swift with Fun</h3>
+<h3>📚 Learning Swift with Fun</h3>
 
 * This template isn’t just for building apps—it’s also a playground for exploring Swift and SwiftUI. Learn by:
 * Modifying the Contacts tab to connect with your own data.
