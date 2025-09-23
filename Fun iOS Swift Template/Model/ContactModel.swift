@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Contact {
+public class ContactModel {
     var firstName: String
     var lastName: String
     var phone: String
