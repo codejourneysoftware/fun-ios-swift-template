@@ -1,9 +1,14 @@
 import SwiftUI
+import SwiftData
 
 struct ContactView: View {
-    @State private var contacts: [Contact] = []
+    @Query(sort: \ContactModel.firstName) private var contacts: [ContactModel]
+    @State private var contactService: ContactService?
+    @Environment(\.modelContext) private var modelContext
+    
     @State private var showingAddContact = false
-    @State private var newContactName = ""
+    @State private var newContactFirstName = ""
+    @State private var newContactLastName = ""
     @State private var newContactEmail = ""
     @State private var newContactPhone = ""
 
@@ -33,8 +38,9 @@ struct ContactView: View {
             } else {
                 List(contacts) { contact in
                     VStack(alignment: .leading) {
-                        if !contact.name.isEmpty {
-                            Text(contact.name)
+                        // Display first and last name if available
+                        if !contact.firstName.isEmpty || !contact.lastName.isEmpty {
+                            Text("\(contact.firstName) \(contact.lastName)".trimmingCharacters(in: .whitespaces))
                                 .font(.headline)
                         }
                         if !contact.email.isEmpty {
@@ -51,12 +57,18 @@ struct ContactView: View {
             }
         }
         .padding()
+        .onAppear {
+            contactService = ContactService(modelContext: modelContext)
+        }
         .sheet(isPresented: $showingAddContact) {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Add Contact")
                     .font(.title2)
                     .bold()
-                TextField("Name", text: $newContactName)
+                TextField("First Name", text: $newContactFirstName)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 250)
+                TextField("Last Name", text: $newContactLastName)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 250)
                 TextField("Email", text: $newContactEmail)
@@ -67,29 +79,35 @@ struct ContactView: View {
                     .frame(width: 250)
                 HStack {
                     Spacer()
-                    Button("Cancel") {
+                    Button("Cancel", action: {
                         showingAddContact = false
-                        newContactName = ""
-                        newContactEmail = ""
-                        newContactPhone = ""
-                    }
-                    Button("Add") {
-                        let trimmedName = newContactName.trimmingCharacters(in: .whitespaces)
+                        clearFields()
+                    })
+                    Button("Add", action: {
+                        let trimmedFirstName = newContactFirstName.trimmingCharacters(in: .whitespaces)
+                        let trimmedLastName = newContactLastName.trimmingCharacters(in: .whitespaces)
                         let trimmedEmail = newContactEmail.trimmingCharacters(in: .whitespaces)
                         let trimmedPhone = newContactPhone.trimmingCharacters(in: .whitespaces)
-                        guard !trimmedName.isEmpty || !trimmedEmail.isEmpty || !trimmedPhone.isEmpty else { return }
-                        contacts.append(Contact(name: trimmedName, email: trimmedEmail, phone: trimmedPhone))
+                        // Ensure at least one field is filled
+                        guard !trimmedFirstName.isEmpty || !trimmedLastName.isEmpty || !trimmedEmail.isEmpty || !trimmedPhone.isEmpty else { return }
+                        // Insert new contact using ContactService
+                        contactService?.insertContact(firstName: trimmedFirstName, lastName: trimmedLastName, phone: trimmedPhone, email: trimmedEmail)
                         showingAddContact = false
-                        newContactName = ""
-                        newContactEmail = ""
-                        newContactPhone = ""
-                    }
+                        clearFields()
+                    })
                     .keyboardShortcut(.defaultAction)
                 }
             }
             .padding(24)
             .frame(minWidth: 300)
         }
+    }
+    
+    private func clearFields() {
+        newContactFirstName = ""
+        newContactLastName = ""
+        newContactEmail = ""
+        newContactPhone = ""
     }
 }
 
